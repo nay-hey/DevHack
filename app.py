@@ -1,14 +1,18 @@
-# app.py
-
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
+from flask_pymongo import PyMongo
 import pandas as pd
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
-def calculate_data_analysis_summary(df):
-    # Calculate basic statistics or any other data analysis summary you want
-    summary = df.describe()  # Using describe as an example, you can customize as needed
-    return summary.to_html(classes='table table-striped', index=True)
+app.config['MONGO_URI'] = 'mongodb+srv://roopikasaxena19:rWYPB8V2GM9s7zrc@cluster0.yal08d9.mongodb.net/'
+mongo = PyMongo(app)
+
+# User model
+class User:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = generate_password_hash(password)
 
 @app.route('/')
 def index():
@@ -37,10 +41,48 @@ def dashboard():
             labels = df[x_column_name].tolist()
             data = df[y_column_name].tolist()
 
-            # Calculate data analysis summary
-            data_analysis_summary = calculate_data_analysis_summary(df)
+            return render_template('dashboard_chartjs.html', labels=labels, data=data)
 
-            return render_template('dashboard_chartjs.html', labels=labels, data=data, data_analysis_summary=data_analysis_summary)
+# ...
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        existing_user = mongo.db.users.find_one({'username': username})
+
+        if existing_user:
+            flash('Username already exists. Please choose a different one.', 'error')
+        else:
+            new_user = User(username, password)
+            mongo.db.users.insert_one({'username': new_user.username, 'password': new_user.password})
+            flash('Account created successfully. You can now log in.', 'success')
+            return redirect(url_for('index'))  # Redirect to index page after registration
+
+    return render_template('register.html')
+
+
+@app.route('/login.html', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        user = mongo.db.users.find_one({'username': username})
+
+        if user and check_password_hash(user['password'], password):
+            flash('Login successful.', 'success')
+            # Add any additional logic you need after a successful login
+            return redirect(url_for('index'))  # Redirect to index page after login
+        else:
+            flash('Invalid username or password. Please try again.', 'error')
+
+    return render_template('login.html')
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
