@@ -11,7 +11,6 @@
 </head>
 <body>
     <h1>Upload Your Data and Select Columns</h1>
-    
     <form action="/dashboard" method="post" enctype="multipart/form-data">
         <label for="fileInput">Choose a CSV file:</label>
         <input type="file" name="file" id="fileInput" accept=".csv" required>
@@ -28,14 +27,6 @@
 
         <button type="submit">Generate Dashboard</button>
     </form>
-    <label for="chartType">Select Chart Type:</label>
-    <select name="chartType" id="chartType" required>
-    <option value="bar">Bar Chart</option>
-    <option value="pie">Pie Chart</option>
-    <!-- Add more chart types as needed -->
-    </select>
-
-    <button type="submit">Generate Dashboard</button>
 
     <script>
         // Function to update column options based on CSV headers
@@ -79,14 +70,6 @@
         // Attach event listener to file input
         const fileInput = document.getElementById('fileInput');
         fileInput.addEventListener('change', () => handleFileInput(fileInput));
-        function updateChartType() {
-            chartType = document.getElementById('chartType').value;
-            updateChart();
-        }
-    
-        // Attach event listener to chart type select
-        const chartTypeSelect = document.getElementById('chartType');
-        chartTypeSelect.addEventListener('change', updateChartType);
     </script>
 </body>
 </html>
