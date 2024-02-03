@@ -13,6 +13,16 @@
             max-width: 600px;
             margin: 20px;
         }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -21,7 +31,7 @@
     <div>
         <h2>Data Analysis Summary</h2>
         <!-- Placeholder for data analysis summary -->
-        <div id="dataAnalysisSummary"></div>
+        <div id="data_analysis_summary"></div>
     </div>
 
     <div>
@@ -40,6 +50,18 @@
 
     <!-- Button to Update Chart -->
     <button type="button" onclick="updateChart()">Generate Dashboard</button>
+    <button onclick="updateChartType(); updateChart()">Bar Chart</button>
+    <button onclick="updateChartType(); updateChart()">Pie Chart</button>
+    <button onclick="updateChartType(); updateChart()">Scatter Plot</button>
+    <!-- Add more buttons for other chart types as needed -->
+
+    <!-- File input for Excel sheet -->
+    <label for="excelInput">Upload Excel Sheet:</label>
+    <input type="file" id="excelInput" accept=".csv" />
+    <button onclick="previewExcel()">Preview Excel</button>
+
+    <!-- Excel sheet preview section -->
+    <div id="excelPreview"></div>
 
     <script>
         // Extracted data from Python backend
@@ -91,7 +113,7 @@
         function displayDataAnalysis() {
             // Placeholder text
             var summaryPlaceholder = "Data Analysis Summary:\nPlaceholder Text";
-            document.getElementById('dataAnalysisSummary').innerText = summaryPlaceholder;
+            document.getElementById('data_analysis_summary').innerText = summaryPlaceholder;
         }
 
         // Function to generate random colors for charts
@@ -112,12 +134,47 @@
                 return data;
             }
         }
+        function previewExcel() {
+            const excelInput = document.getElementById('excelInput');
+            const file = excelInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const excelData = event.target.result;
+
+                    // You can use a library like 'xlsx' to parse Excel data
+                    // For simplicity, let's assume it's a CSV and display it in a table
+                    const rows = excelData.split('\n');
+                    const table = document.createElement('table');
+
+                    rows.forEach(row => {
+                        const rowData = row.split(',');
+                        const tableRow = document.createElement('tr');
+
+                        rowData.forEach(cellData => {
+                            const tableCell = document.createElement('td');
+                            tableCell.textContent = cellData;
+                            tableRow.appendChild(tableCell);
+                        });
+
+                        table.appendChild(tableRow);
+                    });
+
+                    // Clear existing preview
+                    document.getElementById('excelPreview').innerHTML = '';
+
+                    // Append the table to the preview section
+                    document.getElementById('excelPreview').appendChild(table);
+                };
+
+                reader.readAsText(file);
+            } else {
+                alert('Please select an Excel sheet first.');
+            }
+        }
     </script>
 
-    <!-- Add buttons to switch between chart types -->
-    <button onclick="updateChartType(); updateChart()">Bar Chart</button>
-    <button onclick="updateChartType(); updateChart()">Pie Chart</button>
-    <button onclick="updateChartType(); updateChart()">Scatter Plot</button>
-    <!-- Add more buttons for other chart types as needed -->
 </body>
 </html>
