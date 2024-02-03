@@ -1,0 +1,92 @@
+<!-- templates/index_chartjs.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data and Select Columns</title>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Upload Your Data and Select Columns</h1>
+    
+    <form action="/dashboard" method="post" enctype="multipart/form-data">
+        <label for="fileInput">Choose a CSV file:</label>
+        <input type="file" name="file" id="fileInput" accept=".csv" required>
+        
+        <label for="x_column">Select X-axis Column:</label>
+        <select name="x_column" id="x_column" required>
+            <!-- Options will be dynamically added based on CSV columns using JavaScript -->
+        </select>
+
+        <label for="y_column">Select Y-axis Column:</label>
+        <select name="y_column" id="y_column" required>
+            <!-- Options will be dynamically added based on CSV columns using JavaScript -->
+        </select>
+
+        <button type="submit">Generate Dashboard</button>
+    </form>
+    <label for="chartType">Select Chart Type:</label>
+    <select name="chartType" id="chartType" required>
+    <option value="bar">Bar Chart</option>
+    <option value="pie">Pie Chart</option>
+    <!-- Add more chart types as needed -->
+    </select>
+
+    <button type="submit">Generate Dashboard</button>
+
+    <script>
+        // Function to update column options based on CSV headers
+        function updateColumnOptions(headers) {
+            const xColumnSelect = document.getElementById('x_column');
+            const yColumnSelect = document.getElementById('y_column');
+
+            // Clear existing options
+            xColumnSelect.innerHTML = "";
+            yColumnSelect.innerHTML = "";
+
+            // Add new options
+            headers.forEach((header, index) => {
+                const optionX = document.createElement("option");
+                optionX.text = header;
+                optionX.value = index;
+                xColumnSelect.add(optionX);
+
+                const optionY = document.createElement("option");
+                optionY.text = header;
+                optionY.value = index;
+                yColumnSelect.add(optionY);
+            });
+        }
+
+        // Function to read CSV file and update column options
+        function handleFileInput(fileInput) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const csvData = event.target.result;
+                const rows = csvData.split('\n');
+                const headers = rows[0].split(',');
+                updateColumnOptions(headers);
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Attach event listener to file input
+        const fileInput = document.getElementById('fileInput');
+        fileInput.addEventListener('change', () => handleFileInput(fileInput));
+        function updateChartType() {
+            chartType = document.getElementById('chartType').value;
+            updateChart();
+        }
+    
+        // Attach event listener to chart type select
+        const chartTypeSelect = document.getElementById('chartType');
+        chartTypeSelect.addEventListener('change', updateChartType);
+    </script>
+</body>
+</html>
