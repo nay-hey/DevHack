@@ -9,24 +9,131 @@
     <!-- Add Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        canvas {
-            max-width: 600px;
+        body {
+            font-family: 'Arial', sans-serif;
             margin: 20px;
+            padding: 20px;
+            background: linear-gradient(45deg, #256fb5, rgb(137, 156, 166), #bc387a);
+            color: white;
         }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        h2 {
+            margin-top: 40px;
+        }
+
+        .card {
+            background-color: #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            transition: background-color 0.3s ease;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #256fb5, rgb(137, 156, 166), #bc387a);
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: #333;
+            border-color: black;
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        input,
+        select {
+            width: calc(100% - 16px);
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            background-color: #333;
+            border-radius: 8px;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            border-radius: 4px;
+        }
+
+        .navbar a:hover {
+            background-color: rgb(228, 162, 198);
+        }
+
+        .active {
+            background-color: rgb(228, 162, 198);
+        }
+
+        canvas {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+        }
+
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
         }
+
         table, th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
+            color: white;
         }
+
         td input {
-            width: 100%;
+            width: calc(100% - 16px);
+        }
+
+        #excelPreview {
+            margin-top: 20px;
         }
     </style>
+    
 </head>
 <body>
     <h1>Dashboard</h1>
@@ -43,20 +150,11 @@
     </div>
 
     <!-- Select Chart Type Dropdown -->
-    <label for="chartType">Select Chart Type:</label>
-    <select name="chartType" id="chartType" required>
-        <option value="bar">Bar Chart</option>
-        <option value="pie">Pie Chart</option>
-        <option value="scatter">Scatter Plot</option>
-        <!-- Add more chart types as needed -->
-    </select>
-
-    <!-- Button to Update Chart -->
     <button type="button" onclick="updateChart()">Generate Dashboard</button>
-    <button onclick="updateChartType(); updateChart()">Bar Chart</button>
-    <button onclick="updateChartType(); updateChart()">Pie Chart</button>
-    <button onclick="updateChartType(); updateChart()">Scatter Plot</button>
-    <!-- Add more buttons for other chart types as needed -->
+    <button onclick="updateChartType('bar')">Bar Chart</button>
+    <button onclick="updateChartType('pie')">Pie Chart</button>
+    <button onclick="updateChartType('scatter')">Scatter Plot</button>
+
 
     <!-- File input for Excel sheet -->
     <label for="excelInput">Upload Excel Sheet:</label>
@@ -109,8 +207,9 @@
         }
 
         // Function to update chart type based on user selection
-        function updateChartType() {
-            chartType = document.getElementById('chartType').value;
+        function updateChartType(type) {
+            chartType = type;
+            updateChart();
         }
 
         // Function to display basic data analysis summary (placeholder)
