@@ -25,14 +25,14 @@
         function readFile(fileInput) {
             const file = fileInput.files[0];
             const reader = new FileReader();
-
+    
             reader.onload = function (event) {
                 const csvData = event.target.result;
                 // Parse CSV data (You may need to modify this based on your CSV structure)
                 const rows = csvData.split('\n');
                 const labels = rows[0].split(',');
                 const data = rows.slice(1).map(row => row.split(',').map(Number));
-
+    
                 // Update the chart with new data
                 myChart.data = {
                     labels: labels,
@@ -46,19 +46,23 @@
                 };
                 myChart.update();
             };
-
+    
             reader.readAsText(file);
         }
-
+    
         // Function to update chart data
-        function updateData() {
+        function updateData(chartType) {
             // Implement your data update logic here if needed
             // This function can be used to update the chart with different data sets
             // For simplicity, we are using the readFile function to update with file data
             const fileInput = document.getElementById('fileInput');
             readFile(fileInput);
+    
+            // Change chart type based on the provided parameter
+            myChart.config.type = chartType;
+            myChart.update();
         }
-
+    
         // Create a chart
         const ctx = document.getElementById('myChart').getContext('2d');
         const myChart = new Chart(ctx, {
@@ -82,5 +86,10 @@
             }
         });
     </script>
+    
+    <!-- Add buttons to switch between chart types -->
+    <button onclick="updateData('bar')">Bar Chart</button>
+    <button onclick="updateData('pie')">Pie Chart</button>
+    <button onclick="updateData('scatter')">Scatter Chart</button>
 </body>
 </html>
