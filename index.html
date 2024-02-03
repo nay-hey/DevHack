@@ -15,46 +15,64 @@
 </head>
 <body>
     <h1>Dynamically Changing Graphs</h1>
+    <label for="fileInput">Choose a file:</label>
+    <input type="file" id="fileInput" accept=".csv" />
     <button onclick="updateData()">Update Data</button>
     <canvas id="myChart" width="400" height="200"></canvas>
 
     <script>
-        // Sample initial data
-        let initialData = {
-            labels: ['January', 'February', 'March', 'April', 'May'],
-            datasets: [{
-                label: 'Monthly Sales',
-                data: [12, 19, 3, 5, 2],
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
-            }]
-        };
+        // Function to read data from a file
+        function readFile(fileInput) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (event) {
+                const csvData = event.target.result;
+                // Parse CSV data (You may need to modify this based on your CSV structure)
+                const rows = csvData.split('\n');
+                const labels = rows[0].split(',');
+                const data = rows.slice(1).map(row => row.split(',').map(Number));
+
+                // Update the chart with new data
+                myChart.data = {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Data from File',
+                        data: data[0], // Assuming one row of data for simplicity
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                };
+                myChart.update();
+            };
+
+            reader.readAsText(file);
+        }
 
         // Function to update chart data
         function updateData() {
-            // Generate new random data
-            let newData = {
-                labels: ['January', 'February', 'March', 'April', 'May'],
+            // Implement your data update logic here if needed
+            // This function can be used to update the chart with different data sets
+            // For simplicity, we are using the readFile function to update with file data
+            const fileInput = document.getElementById('fileInput');
+            readFile(fileInput);
+        }
+
+        // Create a chart
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
                 datasets: [{
-                    label: 'Monthly Sales',
-                    data: Array.from({ length: 5 }, () => Math.floor(Math.random() * 20)),
+                    label: 'Data from File',
+                    data: [],
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     borderColor: 'rgba(75, 192, 192, 1)',
                     borderWidth: 1
                 }]
-            };
-
-            // Update the chart with new data
-            myChart.data = newData;
-            myChart.update();
-        }
-
-        // Create a chart
-        let ctx = document.getElementById('myChart').getContext('2d');
-        let myChart = new Chart(ctx, {
-            type: 'bar',
-            data: initialData,
+            },
             options: {
                 scales: {
                     y: {
