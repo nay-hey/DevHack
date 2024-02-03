@@ -23,6 +23,9 @@
             padding: 8px;
             text-align: left;
         }
+        td input {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -62,6 +65,7 @@
 
     <!-- Excel sheet preview section -->
     <div id="excelPreview"></div>
+    <button onclick="updateTable()">Update Table</button>
 
     <script>
         // Extracted data from Python backend
@@ -127,13 +131,42 @@
 
         // Function to get data based on chart type
         function getDataForChartType(type) {
-            if (type === 'scatter') {
-                // Scatter plot requires an array of objects with x and y properties
-                return data.map((value, index) => ({ x: index, y: value }));
+    if (type === 'scatter') {
+        // Scatter plot requires an array of objects with x and y properties
+        return data.map((value, index) => ({ x: index, y: value }));
+    } else if (type === 'pie') {
+        // Pie chart requires a simple array of values
+        return data.flat(); // Assuming each row contains only one value for pie chart
+    } else {
+        return data;
+    }
+}
+        function updateTable() {
+            const table = document.getElementById('excelPreview');
+            const rows = table.getElementsByTagName('tr');
+        
+            // Extract data from the updated table
+            const updatedData = [];
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const rowData = [];
+                for (let j = 0; j < cells.length; j++) {
+                    const inputElement = cells[j].getElementsByTagName('input')[0];
+                    rowData.push(parseFloat(inputElement.value));
+                }
+                updatedData.push(rowData);
+            }
+        
+            // Check if any data is updated before applying to the chart
+            if (updatedData.length > 0) {
+                // Assuming each row in the table corresponds to one dataset in the graph
+                data = updatedData;
+                updateChart();
             } else {
-                return data;
+                console.error("No updated data found.");
             }
         }
+        
         function previewExcel() {
             const excelInput = document.getElementById('excelInput');
             const file = excelInput.files[0];
@@ -153,15 +186,17 @@
                         const rowData = row.split(',');
                         const tableRow = document.createElement('tr');
 
-                        rowData.forEach(cellData => {
+                        rowData.forEach((cellData, cellIndex) => {
                             const tableCell = document.createElement('td');
-                            tableCell.textContent = cellData;
+                            const inputElement = document.createElement('input');
+                            inputElement.type = 'text';
+                            inputElement.value = cellData;
+                            tableCell.appendChild(inputElement);
                             tableRow.appendChild(tableCell);
                         });
 
                         table.appendChild(tableRow);
                     });
-
                     // Clear existing preview
                     document.getElementById('excelPreview').innerHTML = '';
 
