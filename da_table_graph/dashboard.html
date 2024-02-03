@@ -1,0 +1,26 @@
+<!-- dashboard.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    
+    <div>
+        <h2>Data Analysis Summary</h2>
+        {{ table|safe }}
+    </div>
+
+    <div>
+        <h2>Chart</h2>
+        <div id="chart">{{ chart|safe }}</div>
+    </div>
+
+    <!-- Add Plotly.js library -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</body>
+</html>
