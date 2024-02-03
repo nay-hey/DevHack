@@ -1,0 +1,21 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data</title>
+</head>
+<body>
+    <h1>Upload Your Data</h1>
+    <form action="/dashboard" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv">
+        <label for="x_column">Enter X-axis Column Number:</label>
+        <input type="number" name="x_column" id="x_column" required>
+        <label for="y_column">Enter Y-axis Column Number:</label>
+        <input type="number" name="y_column" id="y_column" required>
+        <button type="submit">Generate Dashboard</button>
+    </form>
+</body>
+</html>
