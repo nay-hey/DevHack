@@ -1,5 +1,5 @@
-#Download the files
+Download the files
 
-#To execute use command:
+To execute use command:
 
-##python app.py
+python app.py
