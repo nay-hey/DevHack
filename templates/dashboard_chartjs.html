@@ -1,0 +1,123 @@
+<!-- templates/dashboard_chartjs.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        canvas {
+            max-width: 600px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dashboard</h1>
+
+    <div>
+        <h2>Data Analysis Summary</h2>
+        <!-- Placeholder for data analysis summary -->
+        <div id="dataAnalysisSummary"></div>
+    </div>
+
+    <div>
+        <h2>Chart</h2>
+        <canvas id="myChart" width="400" height="200"></canvas>
+    </div>
+
+    <!-- Select Chart Type Dropdown -->
+    <label for="chartType">Select Chart Type:</label>
+    <select name="chartType" id="chartType" required>
+        <option value="bar">Bar Chart</option>
+        <option value="pie">Pie Chart</option>
+        <option value="scatter">Scatter Plot</option>
+        <!-- Add more chart types as needed -->
+    </select>
+
+    <!-- Button to Update Chart -->
+    <button type="button" onclick="updateChart()">Generate Dashboard</button>
+
+    <script>
+        // Extracted data from Python backend
+        var labels = {{ labels|tojson|safe }};
+        var data = {{ data|tojson|safe }};
+        var chartType = 'bar'; // Default chart type
+        var myChart; // Variable to hold the chart instance
+
+        // Function to create and update the chart based on the selected chart type
+        function updateChart() {
+            // Clear existing chart
+            if (myChart) {
+                myChart.destroy();
+            }
+
+            // Create a new chart based on the selected type
+            var ctx = document.getElementById('myChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: chartType, // Use the chartType variable here
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Data from File',
+                        data: getDataForChartType(chartType),
+                        backgroundColor: getChartColors(chartType, data.length),
+                        borderColor: getChartColors(chartType, data.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Calculate and display basic data analysis summary
+            displayDataAnalysis();
+        }
+
+        // Function to update chart type based on user selection
+        function updateChartType() {
+            chartType = document.getElementById('chartType').value;
+        }
+
+        // Function to display basic data analysis summary (placeholder)
+        function displayDataAnalysis() {
+            // Placeholder text
+            var summaryPlaceholder = "Data Analysis Summary:\nPlaceholder Text";
+            document.getElementById('dataAnalysisSummary').innerText = summaryPlaceholder;
+        }
+
+        // Function to generate random colors for charts
+        function getChartColors(type, count) {
+            var colors = [];
+            for (var i = 0; i < count; i++) {
+                colors.push('#' + Math.floor(Math.random()*16777215).toString(16));
+            }
+            return type === 'pie' ? colors : colors[0];
+        }
+
+        // Function to get data based on chart type
+        function getDataForChartType(type) {
+            if (type === 'scatter') {
+                // Scatter plot requires an array of objects with x and y properties
+                return data.map((value, index) => ({ x: index, y: value }));
+            } else {
+                return data;
+            }
+        }
+    </script>
+
+    <!-- Add buttons to switch between chart types -->
+    <button onclick="updateChartType(); updateChart()">Bar Chart</button>
+    <button onclick="updateChartType(); updateChart()">Pie Chart</button>
+    <button onclick="updateChartType(); updateChart()">Scatter Plot</button>
+    <!-- Add more buttons for other chart types as needed -->
+</body>
+</html>
