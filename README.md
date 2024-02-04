@@ -19,6 +19,19 @@ First download all the necessary languages in which the program is written in
 
 Download all the necessary packages in Python, to do so run the following command in the terminal
 ```
-> npm run dev
+pip install Flask flask-pymongo pandas Werkzeug simpleeval scikit-learn
 ```
 
+Initiate the following command in the terminal to get the JSON package
+```
+npm init
+```
+
+To run the website, run this command 
+```
+python app.py
+```
+Then run the following URL on the browser
+```
+http://127.0.0.1:5000
+```
