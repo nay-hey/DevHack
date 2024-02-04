@@ -9,6 +9,7 @@ ________________________________________________________________________________
 - **Dashboard Creation**: Create personalized dashboards to monitor key metrics and trends.
 - **User-friendly Interface**: Intuitive design for easy navigation and usage.
 
+Link to the demo video: https://youtu.be/2DXncNR16wc?feature=shared
 ________________________________________________________________________________________________________________________________________________________
 
 ### Instructions to run the website 
@@ -80,3 +81,4 @@ Then run the following URL on the browser
 ```
 http://127.0.0.1:5000
 ```
+
