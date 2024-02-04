@@ -1,0 +1,404 @@
+<!-- templates/dashboard_chartjs.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background: linear-gradient(45deg, #256fb5, rgb(137, 156, 166), #bc387a);
+            color: white;
+        }
+
+        h1,  h3 {
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        h2 {
+            color:black;
+            font-weight: bold;
+           margin-left: 30px;
+        }
+
+        .card {
+    background-color: #333;
+    border-radius: 8px;
+    padding: 40px;
+    margin: 20px auto;
+    transition: background-color 0.3s ease;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #256fb5, rgb(137, 156, 166), #bc387a);
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: #333;
+            border-color: black;
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        input,
+        select {
+            width: calc(100% - 16px);
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            background-color: #333;
+            border-radius: 8px;
+            height: 60px;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            border-radius: 4px;
+        }
+
+        .navbar a:hover {
+            background-color: rgb(228, 162, 198);
+        }
+
+        .active {
+            background-color: rgb(228, 162, 198);
+        }
+
+        canvas {
+            max-width: 800px;
+            margin: 20px auto;
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            color: white;
+        }
+
+        td input {
+            width: calc(100% - 16px);
+        }
+
+        #excelPreview {
+            margin-top: 20px;
+        }
+        
+
+.navbar {
+            display: flex;
+            align-items: center;
+            margin-left: -40px;
+            background-color: #333;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .active {
+            background-color: rgb(228, 162, 198);
+        }
+
+        @media screen and (max-width: 500px) {
+            .navbar a {
+                float: none;
+                display: block;
+            }
+        }
+
+.chart-container {
+    width: 100%;
+    overflow: hidden;
+}
+
+    </style>
+    
+</head>
+<body>
+    <div class="navbar" style="margin-right: -40px; margin-top: -20px;">
+        <img src="{{ url_for('static', filename='pandalogo.png') }}" alt="hi" style="height: 50px; width: 80px; margin-left: -15px;">
+        <h2> Dashboard</h2>
+        <div class="dashboard-links" style="margin-left: 600px;">
+           
+            <a href="/" style="text-align: right;"> <i class="fa fa-home" aria-hidden="true"></i> Home</a>
+            <a href="/logout" style="text-align: right;"><i class="fa fa-fw fa-sign-out"></i> Logout</a>
+        </div>
+    </div>
+
+    
+    <div class="card">
+        <div>
+            
+            <div class="chart-container">
+                <canvas id="myChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Select Chart Type Dropdown -->
+    <button type="button" onclick="updateChart()">Generate Dashboard</button>
+    <button onclick="updateChartType('bar')">Bar Chart</button>
+    <button onclick="updateChartType('pie')">Pie Chart</button>
+    <button onclick="updateChartType('scatter')">Scatter Plot</button>
+
+
+    <label for="excelInput">Upload Excel Sheet:</label>
+<input type="file" id="excelInput" accept=".csv" />
+    <button onclick="previewExcel()">Preview Excel</button>
+
+    <!-- Excel sheet preview section -->
+    <div id="excelPreview"></div>
+    <button onclick="updateTable()">Update Table</button>
+    <button onclick="window.location.href='/ask_question'">Ask a Question</button>
+
+
+    <script>
+        // Extracted data from Python backend
+        var labels = {{ labels|tojson|safe }};
+        var data = {{ data|tojson|safe }};
+        var chartType = 'bar'; // Default chart type
+        var myChart; // Variable to hold the chart instance
+
+        // Function to create and update the chart based on the selected chart type
+        function updateChart() {
+            // Clear existing chart
+            if (myChart) {
+                myChart.destroy();
+            }
+            function updateChart() {
+        // Clear existing chart
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        // Create a new chart based on the selected type
+        var ctx = document.getElementById('myChart').getContext('2d');
+        myChart = new Chart(ctx, {
+            type: chartType,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Data from File',
+                    data: getDataForChartType(chartType),
+                    backgroundColor: getChartColors(chartType, data.length),
+                    borderColor: getChartColors(chartType, data.length),
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Calculate the width and height of the graph
+        var graphWidth = document.getElementById('myChart').width;
+        var graphHeight = document.getElementById('myChart').height;
+
+        // Set the card width and move it away from the navbar based on the graph size
+        var card = document.querySelector('.card');
+        card.style.width = graphWidth + 'px';
+        card.style.marginLeft = (graphWidth > 400 ? -(graphWidth - 400) / 2 : 0) + 'px';
+        card.style.marginTop = (graphHeight > 200 ? -(graphHeight - 200) / 2 : 0) + 'px';
+
+        // ... (Your existing code)
+    }
+            // Create a new chart based on the selected type
+            var ctx = document.getElementById('myChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: chartType, // Use the chartType variable here
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Data from File',
+                        data: getDataForChartType(chartType),
+                        backgroundColor: getChartColors(chartType, data.length),
+                        borderColor: getChartColors(chartType, data.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Calculate and display basic data analysis summary
+            displayDataAnalysis();
+        }
+
+        // Function to update chart type based on user selection
+        function updateChartType(type) {
+            chartType = type;
+            updateChart();
+        }
+
+        // Function to display basic data analysis summary (placeholder)
+        function displayDataAnalysis() {
+            // Placeholder text
+            var summaryPlaceholder = "Data Analysis Summary:\nPlaceholder Text";
+            document.getElementById('data_analysis_summary').innerText = summaryPlaceholder;
+        }
+
+        // Function to generate random colors for charts
+        function getChartColors(type, count) {
+            var colors = [];
+            for (var i = 0; i < count; i++) {
+                colors.push('#' + Math.floor(Math.random()*16777215).toString(16));
+            }
+            return type === 'pie' ? colors : colors[0];
+        }
+
+        // Function to get data based on chart type
+        function getDataForChartType(type) {
+    if (type === 'scatter') {
+        // Scatter plot requires an array of objects with x and y properties
+        return data.map((value, index) => ({ x: index, y: value }));
+    } else if (type === 'pie') {
+        // Pie chart requires a simple array of values
+        return data.flat(); // Assuming each row contains only one value for pie chart
+    } else {
+        return data;
+    }
+}
+        function updateTable() {
+            const table = document.getElementById('excelPreview');
+            const rows = table.getElementsByTagName('tr');
+        
+            // Extract data from the updated table
+            const updatedData = [];
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].getElementsByTagName('td');
+                const rowData = [];
+                for (let j = 0; j < cells.length; j++) {
+                    const inputElement = cells[j].getElementsByTagName('input')[0];
+                    rowData.push(parseFloat(inputElement.value));
+                }
+                updatedData.push(rowData);
+            }
+        
+            // Check if any data is updated before applying to the chart
+            if (updatedData.length > 0) {
+                // Assuming each row in the table corresponds to one dataset in the graph
+                data = updatedData;
+                updateChart();
+            } else {
+                console.error("No updated data found.");
+            }
+        }
+        
+        function previewExcel() {
+            const excelInput = document.getElementById('excelInput');
+            const file = excelInput.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const excelData = event.target.result;
+
+                    // You can use a library like 'xlsx' to parse Excel data
+                    // For simplicity, let's assume it's a CSV and display it in a table
+                    const rows = excelData.split('\n');
+                    const table = document.createElement('table');
+
+                    rows.forEach(row => {
+                        const rowData = row.split(',');
+                        const tableRow = document.createElement('tr');
+
+                        rowData.forEach((cellData, cellIndex) => {
+                            const tableCell = document.createElement('td');
+                            const inputElement = document.createElement('input');
+                            inputElement.type = 'text';
+                            inputElement.value = cellData;
+                            tableCell.appendChild(inputElement);
+                            tableRow.appendChild(tableCell);
+                        });
+
+                        table.appendChild(tableRow);
+                    });
+                    // Clear existing preview
+                    document.getElementById('excelPreview').innerHTML = '';
+
+                    // Append the table to the preview section
+                    document.getElementById('excelPreview').appendChild(table);
+                };
+
+                reader.readAsText(file);
+            } else {
+                alert('Please select an Excel sheet first.');
+            }
+        }
+        
+    </script>
+
+</body>
+</html>
