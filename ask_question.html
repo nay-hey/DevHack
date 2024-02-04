@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask a Question</title>
+    <style>
+        /* Reset or normalize styles can be added here if needed */
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background: linear-gradient(45deg, #256fb5, rgb(137, 156, 166), #bc387a);
+        }
+
+        h2 {
+            color: black;
+            font-weight: bold;
+            margin-left: 30px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #256fb5, rgb(137, 156, 166), #bc387a);
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-color: black;
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        input[type="button"] {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        input[type="button"]:hover {
+            background-color: #333;
+        }
+
+        #searchInputs,
+        #aggregationInputs {
+            display: none;
+        }
+
+        #answer {
+            margin-top: 20px;
+            font-weight: bold;
+            color: black;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            margin-left: -40px;
+            background-color: #333;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .active {
+            background-color: #e4a2c6; /* Use a hexadecimal color code */
+        }
+
+        @media screen and (max-width: 500px) {
+            .navbar a {
+                float: none;
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar" style="margin-right: -40px; margin-top: -20px;">
+        <img src="{{ url_for('static', filename='pandalogo.png') }}" alt="hi" style="height: 50px; width: 80px; margin-left: 20px;">
+        <h2>AI Generated Dashboard</h2>
+        <div class="dashboard-links" style="margin-left: 600px;">
+            {% if 'username' in session %}
+            <a href="/logout" style="text-align: right;"><i class="fa fa-fw fa-sign-out"></i> Logout</a>
+            {% else %}
+            <a href="/login" style="text-align: right;"><i class="fa fa-fw fa-user"></i> Login</a>
+            <a href="/register" style="text-align: right;"><i class="fa fa-fw fa-user"></i> Register</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <form id="questionForm" method="POST">
+            <h2>Ask a Question</h2>
+            <label for="question_type">Select a Question Type:</label>
+            <select name="question_type" id="question_type">
+                <option value="sort">Sort Data</option>
+                <option value="search">Search Data</option>
+                <option value="aggregate">Aggregate Data</option>
+            </select>
+            <br><br>
+            <label for="question_column">Select a Column (if applicable):</label>
+            <select name="question_column" id="question_column">
+                {% for column in df.columns %}
+                <option value="{{ column }}">{{ column }}</option>
+                {% endfor %}
+            </select>
+            <br><br>
+
+            <div id="searchInputs">
+                <label for="search_value">Enter Search Value:</label>
+                <input type="text" name="search_value" id="search_value">
+                <br><br>
+            </div>
+
+            <div id="aggregationInputs">
+                <label for="aggregation_function">Select Aggregation Function:</label>
+                <select name="aggregation_function" id="aggregation_function">
+                    <option value="sum">Sum</option>
+                    <option value="mean">Mean</option>
+                    <option value="max">Max</option>
+                    <option value="min">Min</option>
+                </select>
+                <br><br>
+            </div>
+
+            <input type="button" value="Submit Question" onclick="submitQuestion()">
+        </form>
+
+        <div id="answer"></div>
+    </div>
+
+    <script>
+        function submitQuestion() {
+            var form = document.getElementById('questionForm');
+            var formData = new FormData(form);
+
+            var jsonObject = {};
+            formData.forEach(function (value, key) {
+                jsonObject[key] = value;
+            });
+            var jsonData = JSON.stringify(jsonObject);
+
+            fetch('/ask_question', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: jsonData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('answer').innerHTML = 'Answer: ' + data.answer;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+
+</html>
