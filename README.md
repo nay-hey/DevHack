@@ -31,7 +31,6 @@ Then download the following files from css-code-full to a folder named templates
 - index_chartjs_html
 - ask_question.html
 - login.html
-- pandalogo.png
 - register.html
 
 Download **pandalogo.png** from **css-code-full** branch
