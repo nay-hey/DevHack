@@ -1,0 +1,303 @@
+<!-- templates/index_chartjs.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data and Select Columns</title>
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background: linear-gradient(45deg, #256fb5,rgb(137, 156, 166), #bc387a);
+        }
+
+        h3{
+            text-align: center;
+            color:black;
+            font-weight: bold;
+           
+        }
+        h2{
+           
+            color:white;
+            font-weight: bold;
+           margin-left: 30px;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #256fb5,rgb(137, 156, 166), #bc387a);
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: #333;
+            border-color: black;
+            font-weight: bold;
+           
+
+}
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+    background-color: #333;
+    color: white;
+    padding: 10px 20px;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #333;
+}
+.navbar {
+            display: flex;
+            align-items: center;
+            margin-left: -40px;
+            background-color: #333;
+        }
+
+        
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            
+            font-size: 16px;
+            
+        }
+
+/* Current/active navbar link */
+.active {
+  background-color: rgb(228, 162, 198);
+}
+
+/* Add responsiveness - will automatically display the navbar vertically instead of horizontally on screens less than 500 pixels */
+@media screen and (max-width: 500px) {
+  .navbar a {
+    float: none;
+    display: block;
+  }
+}
+
+    /* Add your custom CSS styles here */
+    .flashes-container {
+        width: 100%;
+        max-width: 100%;
+       margin-top: -30px;
+        background-color:  #72a96b;
+        border: 3px solid  black;
+        border-radius: 5px;
+       
+    }
+
+    .flashes {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .flash-item {
+        margin-bottom: 8px;
+        padding: 10px;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        color:black;
+        font-weight: bold;
+        background-color: #72a96b;
+    }
+</style>
+
+
+    
+    
+</head>
+<script>
+    // Assume you have a variable or some logic to determine if the user is registered
+    var isUserRegistered = false; // Change this value based on your condition
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get the elements for Login and Register links
+        var loginLink = document.getElementById("loginLink");
+        var registerLink = document.getElementById("registerLink");
+
+        // Check the condition and toggle the visibility of the links
+        if (isUserRegistered) {
+            // User is registered, hide the links
+            loginLink.style.display = "none";
+            registerLink.style.display = "none";
+        } else {
+            // User is not registered, show the links
+            loginLink.style.display = "block";
+            registerLink.style.display = "block";
+        }
+    });
+</script>
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flashes-container">
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li class="flash-item">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endwith %}
+
+     <div class="navbar"  style="margin-right: -40px; margin-top: -20px;">
+        <img src="{{ url_for('static', filename='pandalogo.png') }}" alt="hi" style="height: 50px; width: 80px; margin-left: 20px;">
+
+         <h2> Dashboard Generator</h2>
+        <div class="dashboard-links" style="margin-left: 600px;">
+            
+            {% if 'username' in session %}
+                <a href="/logout" style="text-align: right;"><i class="fa fa-fw fa-sign-out"></i> Logout</a>
+            {% else %}
+                <a href="/login" style="text-align: right;"><i class="fa fa-fw fa-user"></i> Login</a>
+                <a href="/register" style="text-align: right;"><i class="fa fa-fw fa-user"></i> Register</a>
+            {% endif %}
+        </div>
+        
+    </div>
+    
+   
+    <form action="/dashboard" method="post" enctype="multipart/form-data" style="margin-top: 70px;">
+        <h3>Upload Your Data and Select Columns</h3>
+        <label for="fileInput">Choose a CSV file:</label>
+        <input type="file" name="file" id="fileInput" accept=".csv" required style=" background-color:white; border-color: black;">
+        
+        <label for="x_column">Select X-axis Column:</label>
+        <select name="x_column" id="x_column" required style=" border-color: black;">
+            <!-- Options will be dynamically added based on CSV columns using JavaScript -->
+        </select>
+
+        <label for="y_column">Select Y-axis Column:</label>
+        <select name="y_column" id="y_column" required style=" border-color: black;">
+            <!-- Options will be dynamically added based on CSV columns using JavaScript -->
+        </select>
+        {% if 'username' in session %}
+        <button type="submit">Generate Dashboard</button>
+    </form>
+  {% else %}
+     <p>Please <a href="/login" style="text-align: right; display: inline-block; background-color: black; color: #fff; padding: 10px; border-radius: 5px; text-decoration: none;">
+         Login
+    </a> to generate the dashboard.</p>
+    
+  {% endif %}
+    
+    
+
+
+    <script>
+        // Function to update column options based on CSV headers
+        function updateColumnOptions(headers) {
+            const xColumnSelect = document.getElementById('x_column');
+            const yColumnSelect = document.getElementById('y_column');
+    
+            // Clear existing options
+            xColumnSelect.innerHTML = "";
+            yColumnSelect.innerHTML = "";
+    
+            // Add new options
+            headers.forEach((header, index) => {
+                const optionX = document.createElement("option");
+                optionX.text = header;
+                optionX.value = index;
+                xColumnSelect.add(optionX);
+    
+                const optionY = document.createElement("option");
+                optionY.text = header;
+                optionY.value = index;
+                yColumnSelect.add(optionY);
+            });
+        }
+    
+        // Function to update chart type options
+        function updateChartTypeOptions() {
+            const chartTypeSelect = document.getElementById('chartType');
+            const selectedChartType = chartTypeSelect.value;
+    
+            // Clear existing options
+            chartTypeSelect.innerHTML = "";
+    
+            // Add new options
+            const chartTypes = ["bar", "pie"]; // Add more chart types as needed
+            chartTypes.forEach((type) => {
+                const option = document.createElement("option");
+                option.text = type.charAt(0).toUpperCase() + type.slice(1); // Capitalize first letter
+                option.value = type;
+                chartTypeSelect.add(option);
+            });
+    
+            // Set the selected chart type if it was previously selected
+            if (selectedChartType) {
+                chartTypeSelect.value = selectedChartType;
+            }
+        }
+    
+        // Function to read CSV file and update column options
+        function handleFileInput(fileInput) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+    
+            reader.onload = function (event) {
+                const csvData = event.target.result;
+                const rows = csvData.split('\n');
+                const headers = rows[0].split(',');
+                updateColumnOptions(headers);
+            };
+    
+            reader.readAsText(file);
+        }
+    
+        // Attach event listener to file input
+        const fileInput = document.getElementById('fileInput');
+        fileInput.addEventListener('change', () => {
+            handleFileInput(fileInput);
+            updateChartTypeOptions(); // Update chart type options when file changes
+        });
+    
+        // Function to update chart type based on user selection
+        function updateChartType() {
+            chartType = document.getElementById('chartType').value;
+            updateChart();
+        }
+    
+        // Attach event listener to chart type select
+        const chartTypeSelect = document.getElementById('chartType');
+        chartTypeSelect.addEventListener('change', updateChartType);
+        document.getElementById('excelInput').addEventListener('change', handleFileSelect);
+
+    function handleFileSelect(event) {
+        // Trigger the previewExcel function when a file is selected
+        previewExcel();
+    }
+    </script>
+    
+</body>
+</html>

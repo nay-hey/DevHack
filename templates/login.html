@@ -1,0 +1,155 @@
+<!-- templates/index_chartjs.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background: linear-gradient(45deg, #256fb5, rgb(137, 156, 166), #bc387a);
+        }
+
+        h3 {
+            text-align: center;
+            color: black;
+            font-weight: bold;
+        }
+
+        h2 {
+            color: white;
+            font-weight: bold;
+            margin-left: 30px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #256fb5, rgb(137, 156, 166), #bc387a);
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-color: black;
+            font-weight: bold;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: 2px solid #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            margin-left: -40px;
+            background-color: #333;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .active {
+            background-color: rgb(228, 162, 198);
+        }
+
+        @media screen and (max-width: 500px) {
+            .navbar a {
+                float: none;
+                display: block;
+            }
+        }
+        .flashes-container {
+        width: 100%;
+        max-width: 100%;
+       margin-top: -30px;
+        background-color:  #72a96b;
+        border: 3px solid  black;
+        border-radius: 5px;
+       
+    }
+
+    .flashes {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .flash-item {
+        margin-bottom: 8px;
+        padding: 10px;
+        border: 1px solid #000000;
+        border-radius: 4px;
+        color:black;
+        font-weight: bold;
+        background-color: #72a96b;
+    }
+    </style>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flashes-container">
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li class="flash-item">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endwith %}
+
+    <div class="navbar" style="margin-right: -40px; margin-top: -20px;">
+        <img src="{{ url_for('static', filename='pandalogo.png') }}" alt="hi" style="height: 50px; width: 80px; margin-left: 20px;">
+        <h2> Dashboard Generator</h2>
+        <div class="dashboard-links" style="margin-left: 600px;">
+            
+            <a href="#" style="text-align: right;"><i class="fa fa-fw fa-user"></i> Login</a>
+            <a href="#" style="text-align: right;"><i class="fa fa-fw fa-user"></i> Register</a>
+        </div>
+    </div>
+
+    <form action="/login" method="post" style="margin-top: 70px;">
+        <h3>Login</h3>
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username" required style="background-color: white; border-color: black;">
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required style="background-color: white; border-color: black;">
+
+        <button type="submit">Login</button>
+    </form>
+</body>
+</html>
