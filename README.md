@@ -72,6 +72,7 @@ Now put this in the code as follows: **app.config['MONGO_URI'] = 'mongodb+srv://
 Initiate the following command in the terminal to get the JSON package
 ```
 npm init
+npm install chart.js
 ```
 To run the website, run this command 
 ```
