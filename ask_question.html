@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Ask a Question</title>
     <style>
         /* Reset or normalize styles can be added here if needed */
@@ -112,75 +113,153 @@
             {% endif %}
         </div>
     </div>
-
-    <div>
-        <form id="questionForm" method="POST">
-            <h2>Ask a Question</h2>
-            <label for="question_type">Select a Question Type:</label>
-            <select name="question_type" id="question_type">
-                <option value="sort">Sort Data</option>
-                <option value="search">Search Data</option>
-                <option value="aggregate">Aggregate Data</option>
-            </select>
-            <br><br>
-            <label for="question_column">Select a Column (if applicable):</label>
-            <select name="question_column" id="question_column">
-                {% for column in df.columns %}
-                <option value="{{ column }}">{{ column }}</option>
-                {% endfor %}
-            </select>
-            <br><br>
-
-            <div id="searchInputs">
-                <label for="search_value">Enter Search Value:</label>
-                <input type="text" name="search_value" id="search_value">
-                <br><br>
-            </div>
-
-            <div id="aggregationInputs">
-                <label for="aggregation_function">Select Aggregation Function:</label>
-                <select name="aggregation_function" id="aggregation_function">
-                    <option value="sum">Sum</option>
-                    <option value="mean">Mean</option>
-                    <option value="max">Max</option>
-                    <option value="min">Min</option>
+    <!DOCTYPE html>
+    <html lang="en">
+    
+   
+        <div>
+            
+            <form id="questionForm" method="POST">     
+                <h2>Ask a Question</h2>  
+                <label for="question_type">Select a Question Type:</label>
+                <select name="question_type" id="question_type">
+                    <option value="sort">Sort Data</option>
+                    <option value="search">Search Data</option>
+                    <option value="aggregate">Aggregate Data</option>
+                    <option value="ml_classification">ML Classification</option>
+                    <option value="basic_analysis">Basic Data Analysis</option>
                 </select>
                 <br><br>
-            </div>
-
-            <input type="button" value="Submit Question" onclick="submitQuestion()">
-        </form>
-
-        <div id="answer"></div>
-    </div>
-
+                <label for="question_column">Select a Column (if applicable):</label>
+                <select name="question_column" id="question_column">
+                    {% for column in df.columns %}
+                        <option value="{{ loop.index0 }}">{{ column }}</option>
+                    {% endfor %}
+                </select>
+    
+                <!-- Additional inputs for searching, aggregation, and ML Classification -->
+                <div id="searchInputs" style="display: none;">
+                    <label for="search_value">Enter Search Value:</label>
+                    <input type="text" name="search_value" id="search_value">
+                </div>
+    
+                <div id="aggregationInputs" style="display: none;">
+                    <label for="aggregation_function">Select Aggregation Function:</label>
+                    <select name="aggregation_function" id="aggregation_function">
+                        <option value="sum">Sum</option>
+                        <option value="mean">Mean</option>
+                        <option value="max">Max</option>
+                        <option value="min">Min</option>
+                    </select>
+                    <br><br>
+                </div>
+    
+                <div id="mlClassificationInputs" style="display: none;">
+                    <label for="target_column">Select the Target Column:</label>
+                    <select name="target_column" id="target_column">
+                        {% for column in df.columns %}
+                            <option value="{{ loop.index0 }}">{{ column }}</option>
+                        {% endfor %}
+                    </select>
+                    <br><br>
+                </div>
+    
+                <input type="button" value="Submit Question" onclick="submitQuestion()">
+            </form>
+    
+            <!-- Display answer here based on Flask route handling questions -->
+            <div id="answer"></div>
+        </div>
+    
+        <!-- Add any additional body elements or scripts here -->
     <script>
         function submitQuestion() {
             var form = document.getElementById('questionForm');
             var formData = new FormData(form);
-
+    
+            // Convert formData to JSON
             var jsonObject = {};
             formData.forEach(function (value, key) {
                 jsonObject[key] = value;
             });
             var jsonData = JSON.stringify(jsonObject);
-
+    
+            // Send AJAX request to Flask route
             fetch('/ask_question', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: jsonData
-                })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Set content type to JSON
+                },
+                body: jsonData
+            })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('answer').innerHTML = 'Answer: ' + data.answer;
+                    var answerHTML = "<h3>Answer:</h3>";
+    
+                    // Check if the question type is 'basic_analysis'
+                    if (data.answer && data.answer.questionType === 'basic_analysis' && data.answer.headers && data.answer.rows) {
+                        // Display basic data analysis results as a table
+                        answerHTML += "<table border='1'><tr>";
+                        for (var i = 0; i < data.answer.headers.length; i++) {
+                            answerHTML += "<th>" + data.answer.headers[i] + "</th>";
+                        }
+                        answerHTML += "</tr>";
+    
+                        for (var j = 0; j < data.answer.rows.length; j++) {
+                            answerHTML += "<tr>";
+                            for (var k = 0; k < data.answer.rows[j].length; k++) {
+                                answerHTML += "<td>" + data.answer.rows[j][k] + "</td>";
+                            }
+                            answerHTML += "</tr>";
+                        }
+    
+                        answerHTML += "</table>";
+                    } else if (data.answer && data.answer.headers && data.answer.rows) {
+                        // Display results as a table for other question types
+                        answerHTML += "<table border='1'><tr>";
+                        for (var i = 0; i < data.answer.headers.length; i++) {
+                            answerHTML += "<th>" + data.answer.headers[i] + "</th>";
+                        }
+                        answerHTML += "</tr>";
+    
+                        for (var j = 0; j < data.answer.rows.length; j++) {
+                            answerHTML += "<tr>";
+                            for (var k = 0; k < data.answer.rows[j].length; k++) {
+                                answerHTML += "<td>" + data.answer.rows[j][k] + "</td>";
+                            }
+                            answerHTML += "</tr>";
+                        }
+    
+                        answerHTML += "</table>";
+    
+                        // Display additional information for ML Classification
+                        if (data.answer.accuracy !== undefined) {
+                            answerHTML += "<p>Accuracy: " + data.answer.accuracy + "</p>";
+                        }
+                    } else {
+                        answerHTML += data.answer;
+                    }
+    
+                    document.getElementById('answer').innerHTML = answerHTML;
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    // Handle errors here, e.g., display an error message
                 });
         }
+    
+        document.getElementById('question_type').addEventListener('change', function () {
+            var mlClassificationInputs = document.getElementById('mlClassificationInputs');
+            var searchInputs = document.getElementById('searchInputs');
+            var aggregationInputs = document.getElementById('aggregationInputs');
+    
+            mlClassificationInputs.style.display = this.value === 'ml_classification' ? 'block' : 'none';
+            searchInputs.style.display = this.value === 'search' ? 'block' : 'none';
+            aggregationInputs.style.display = this.value === 'aggregate' ? 'block' : 'none';
+        });
     </script>
-</body>
-
-</html>
+    
+    </body>
+    
+    </html>
+    
