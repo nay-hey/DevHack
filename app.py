@@ -11,17 +11,19 @@ from sklearn.metrics import accuracy_score
 
 app = Flask(__name__)
 
-app.config['MONGO_URI'] = 'mongodb+srv://roopikasaxena19:rWYPB8V2GM9s7zrc@cluster0.yal08d9.mongodb.net/pandas'
-app.config['SECRET_KEY'] = 'Roopika'
+app.config['MONGO_URI'] = 'mongodb+srv://<username>:<password>@cluster0.your-cluster.mongodb.net/test'
+app.config['SECRET_KEY'] = 'your secret key'
 
 mongo = PyMongo(app)
 
+
+
+
 # User model
 class User:
-    def __init__(self, username, password):
+    def _init_(self, username, password):
         self.username = username
         self.password = generate_password_hash(password)
-
 
 # Global variable to store DataFrame
 df = None
@@ -62,7 +64,9 @@ def dashboard():
 
     # Render the template with df
     return render_template('dashboard_chartjs.html', df=df)
-
+df = pd.DataFrame({'A': [1, 2, 3, 4, 5],
+                   'B': [5, 4, 3, 2, 1],
+                   'C': [10, 20, 30, 40, 50]})
 @app.route('/ask_question', methods=['GET', 'POST'])
 def ask_question():
     global df
@@ -87,8 +91,12 @@ def ask_question():
             # Implement AI/ML-based logic
             if question_type == 'sort':
                 # Sort the DataFrame based on the selected column
+                if question_column not in df.columns:
+                    return jsonify({'answer': f'Column {question_column} does not exist in the DataFrame.'})
+
+                # Format the sorted DataFrame into HTML
                 sorted_df = df.sort_values(by=question_column).reset_index(drop=True)
-    
+
                 # Format the sorted DataFrame into HTML
                 sorted_html = sorted_df.to_html(index=False)
 
@@ -132,16 +140,56 @@ def ask_question():
                 answer = f"Aggregated {question_column} using {aggregation_function}: {result}"
 
             # Add more cases for other question types
+            
+            elif question_type == 'ml_classification':
+                if 'target_column' not in data:
+                    return jsonify({'answer': 'Invalid form data. Missing target_column for ml_classification.'})
+
+                target_column = data['target_column']  # Access data using the correct key
+                if target_column not in df.columns:
+                    return jsonify({'answer': f'Target column {target_column} does not exist in the DataFrame.'})
+
+                features = df.drop(columns=[target_column])
+                target = df[target_column]
+
+                X_train, X_test, y_train, y_test = train_test_split(features, target, test_size=0.2, random_state=42)
+
+                model = RandomForestClassifier()
+                model.fit(X_train, y_train)
+
+                predictions = model.predict(X_test)
+
+                accuracy = accuracy_score(y_test, predictions)
+
+                # Format the answer as a table
+                headers = ['Feature', 'Importance']
+                rows = list(zip(features.columns, model.feature_importances_))
+
+                answer = {'headers': headers, 'rows': rows, 'accuracy': accuracy}
+
+            elif question_type == 'basic_analysis':
+                # Perform basic data analysis (descriptive statistics)
+                descriptive_stats = df.describe()
+                descriptive_stats_transposed = descriptive_stats.transpose()
+
+                # Format the answer as a dictionary
+                answer = {
+                'questionType': 'basic_analysis',
+                'headers': list(descriptive_stats_transposed.columns),
+                'rows': [list(descriptive_stats_transposed.iloc[i]) for i in range(len(descriptive_stats_transposed))]
+                }
+
 
             # Return the answer as JSON
+
             return jsonify({'answer': answer})
+
 
         except Exception as e:
             return jsonify({'answer': f'Error: {str(e)}'})
 
     # If it's a GET request, you might want to handle it differently or return an error
     return render_template('ask_question.html', df=df)
-
 
 
 
