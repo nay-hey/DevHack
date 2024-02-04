@@ -22,9 +22,9 @@ Download all the necessary packages in Python, to do so run the following comman
 ```
 pip install Flask flask-pymongo pandas Werkzeug simpleeval scikit-learn
 ```
-Download **app.py** from **css-code-full** branch 
+Download **app.py** from **main** branch 
 
-Then download the following files from css-code-full to a folder named templates
+Then download the following files from **main** branch to a folder named templates
 
 - index.html
 - dashboard.html
@@ -34,7 +34,7 @@ Then download the following files from css-code-full to a folder named templates
 - login.html
 - register.html
 
-Download **pandalogo.png** from **css-code-full** branch
+Download **pandalogo.png** from **main** branch
 
 ## MongoDB Connection Setup
 
@@ -72,7 +72,6 @@ Initiate the following command in the terminal to get the JSON package
 ```
 npm init
 ```
-
 To run the website, run this command 
 ```
 python app.py
