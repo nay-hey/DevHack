@@ -21,6 +21,15 @@ Download all the necessary packages in Python, to do so run the following comman
 ```
 pip install Flask flask-pymongo pandas Werkzeug simpleeval scikit-learn
 ```
+Download app.py 
+
+Then download the following files in a folder named templates
+
+- index.html
+- dashboard.html
+- dashboard_chartjs.html
+- index_chartjs_html
+
 
 Initiate the following command in the terminal to get the JSON package
 ```
