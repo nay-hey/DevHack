@@ -18,5 +18,7 @@ First download all the necessary languages in which the program is written in
 - Node.js
 
 Download all the necessary packages in Python, to do so run the following command in the terminal
->- pip install Flask flask-pymongo pandas Werkzeug simpleeval scikit-learn
+```
+> npm run dev
+```
 
