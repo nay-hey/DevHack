@@ -21,9 +21,9 @@ Download all the necessary packages in Python, to do so run the following comman
 ```
 pip install Flask flask-pymongo pandas Werkzeug simpleeval scikit-learn
 ```
-Download app.py 
+Download **app.py** from **css-code-full** branch 
 
-Then download the following files in a folder named templates
+Then download the following files from css-code-full to a folder named templates
 
 - index.html
 - dashboard.html
@@ -34,6 +34,7 @@ Then download the following files in a folder named templates
 - pandalogo.png
 - register.html
 
+Download **pandalogo.png** from **css-code-full** branch
 
 Initiate the following command in the terminal to get the JSON package
 ```
