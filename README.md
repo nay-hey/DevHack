@@ -29,6 +29,10 @@ Then download the following files in a folder named templates
 - dashboard.html
 - dashboard_chartjs.html
 - index_chartjs_html
+- ask_question.html
+- login.html
+- pandalogo.png
+- register.html
 
 
 Initiate the following command in the terminal to get the JSON package
