@@ -67,7 +67,7 @@ Replace <username> and <password> with the credentials you created.
 
 Now you have your MongoDB connection URL. Ensure you handle this URL securely, and consider using environment variables to store sensitive information like database credentials. Never share your MongoDB connection URL in public repositories or forums.
 
-Now put this in the code as follows: **app.config['MONGO_URI'] = 'your_mongo_uri_here'**
+Now put this in the code as follows: **app.config['MONGO_URI'] = 'your_mongo_uri_here/your_database_name'**
    
 Initiate the following command in the terminal to get the JSON package
 ```
